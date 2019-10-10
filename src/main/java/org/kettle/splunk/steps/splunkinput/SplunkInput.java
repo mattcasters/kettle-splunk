@@ -1,6 +1,7 @@
 package org.kettle.splunk.steps.splunkinput;
 
 
+import com.splunk.Args;
 import com.splunk.JobArgs;
 import com.splunk.ResultsReaderXml;
 import com.splunk.Service;
@@ -23,6 +24,7 @@ import org.pentaho.di.trans.step.StepMetaInterface;
 import org.pentaho.metastore.api.exceptions.MetaStoreException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -100,15 +102,12 @@ public class SplunkInput extends BaseStep implements StepInterface {
       data.outputRowMeta = new RowMeta();
       meta.getFields( data.outputRowMeta, getStepname(), null, getStepMeta(), this, repository, data.metaStore );
 
-      // Create a job to read the Splunk query ...
+      // Run a one shot search in blocking mode
+      //
+      Args args = new Args();
+      args.put("connection_mode", JobArgs.ExecutionMode.BLOCKING.name());
 
-      data.jobs = data.service.getJobs();
-
-      JobArgs jobArgs = new JobArgs();
-      jobArgs.setExecutionMode( JobArgs.ExecutionMode.BLOCKING );
-
-      data.job = data.jobs.create( environmentSubstitute( meta.getQuery() ), jobArgs );
-      data.eventsStream = data.job.getEvents();
+      data.eventsStream = data.service.oneshotSearch( getTransMeta().environmentSubstitute( meta.getQuery() ), args );
     }
 
     try {
@@ -123,6 +122,7 @@ public class SplunkInput extends BaseStep implements StepInterface {
           String value = event.get( returnValue.getSplunkName() );
           outputRow[ i ] = value;
         }
+
         incrementLinesInput();
         putRow( data.outputRowMeta, outputRow );
       }

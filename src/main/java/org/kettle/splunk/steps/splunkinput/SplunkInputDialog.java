@@ -422,15 +422,21 @@ public class SplunkInputDialog extends BaseStepDialog implements StepDialogInter
       Service service = Service.connect( splunkConnection.getServiceArgs() );
       Args args = new Args();
       args.put("connection_mode", JobArgs.ExecutionMode.BLOCKING.name());
+
       InputStream eventsStream = service.oneshotSearch( transMeta.environmentSubstitute( wQuery.getText() ), args );
 
       Set<String> detectedKeys = new HashSet<>();
       try {
         ResultsReaderXml resultsReader = new ResultsReaderXml(eventsStream);
         HashMap<String, String> event;
+        int nrScanned = 0;
         while ((event = resultsReader.getNextEvent()) != null) {
           for (String key: event.keySet()) {
             detectedKeys.add( key );
+          }
+          nrScanned++;
+          if (nrScanned>10) {
+            break;
           }
         }
       } finally {

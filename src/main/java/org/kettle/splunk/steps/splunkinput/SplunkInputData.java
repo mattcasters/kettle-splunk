@@ -22,7 +22,5 @@ public class SplunkInputData extends BaseStepData implements StepDataInterface {
 
   public ServiceArgs serviceArgs;
   public Service service;
-  public JobCollection jobs;
-  public Job job;
   public InputStream eventsStream;
 }
