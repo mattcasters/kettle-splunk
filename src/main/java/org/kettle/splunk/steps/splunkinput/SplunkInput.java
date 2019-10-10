@@ -104,8 +104,9 @@ public class SplunkInput extends BaseStep implements StepInterface {
 
       // Run a one shot search in blocking mode
       //
-      Args args = new Args();
-      args.put("connection_mode", JobArgs.ExecutionMode.BLOCKING.name());
+      JobArgs args = new JobArgs();
+      args.setMaximumCount( 0 );
+      args.setExecutionMode( JobArgs.ExecutionMode.BLOCKING );
 
       data.eventsStream = data.service.oneshotSearch( getTransMeta().environmentSubstitute( meta.getQuery() ), args );
     }
