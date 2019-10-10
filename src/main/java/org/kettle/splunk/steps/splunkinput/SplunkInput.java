@@ -3,6 +3,7 @@ package org.kettle.splunk.steps.splunkinput;
 
 import com.splunk.Args;
 import com.splunk.JobArgs;
+import com.splunk.JobResultsArgs;
 import com.splunk.ResultsReaderXml;
 import com.splunk.Service;
 import com.splunk.ServiceArgs;
@@ -104,9 +105,9 @@ public class SplunkInput extends BaseStep implements StepInterface {
 
       // Run a one shot search in blocking mode
       //
-      JobArgs args = new JobArgs();
-      args.setMaximumCount( 0 );
-      args.setExecutionMode( JobArgs.ExecutionMode.BLOCKING );
+      JobResultsArgs args = new JobResultsArgs();
+      args.setCount( 0 );
+      args.setOutputMode( JobResultsArgs.OutputMode.XML );
 
       data.eventsStream = data.service.oneshotSearch( getTransMeta().environmentSubstitute( meta.getQuery() ), args );
     }
